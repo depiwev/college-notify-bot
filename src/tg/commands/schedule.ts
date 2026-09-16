@@ -5,10 +5,12 @@ import { formatSubjectName } from "../../tools/format-subject-name.js";
 import { formatDateString } from "../../tools/format-date-string.js";
 import { formatWeekDay } from "../../tools/format-week-day.js";
 import type { AppContext } from "../index.js";
+import { exec } from "child_process";
 
 // -1 = вчера
 // 0 = сегодня
 // 1 = завтра
+// TODO: сделать штуку, которая понимает, что пары закончились
 async function execute(ctx: AppContext, shift: -1 | 0 | 1) {
   if (ctx.chatId?.toString() != AppConfig.NotificationChatId) {
     return;
@@ -38,4 +40,6 @@ async function execute(ctx: AppContext, shift: -1 | 0 | 1) {
   );
 }
 
-export async function scheduleCommand(ctx: AppContext) {}
+export async function scheduleCommand(ctx: AppContext) {
+  execute(ctx, 0)
+}
