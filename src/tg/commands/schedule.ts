@@ -1,11 +1,11 @@
-import { DateTime } from "luxon";
 import { AppConfig } from "../../config.js";
 import { ScheduleModel } from "../../db/schedule.js";
 import { formatSubjectName } from "../../tools/format-subject-name.js";
 import { formatDateString } from "../../tools/format-date-string.js";
 import { formatWeekDay } from "../../tools/format-week-day.js";
 import type { AppContext } from "../index.js";
-import { exec } from "child_process";
+import { DateTime } from "../../tools/datetime-now.js";
+
 
 // -1 = вчера
 // 0 = сегодня
@@ -16,7 +16,7 @@ async function execute(ctx: AppContext, shift: -1 | 0 | 1) {
     return;
   }
 
-  const thisDay = formatDateString(DateTime.now().plus({ day: shift }).toJSDate());
+  const thisDay = formatDateString(DateTime().plus({ day: shift }).toJSDate());
 
   const table = await ScheduleModel.find({
     date: thisDay,
