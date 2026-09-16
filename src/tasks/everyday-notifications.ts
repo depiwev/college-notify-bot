@@ -37,7 +37,7 @@ export function startPairNotifications() {
     return url ?? null;
   }
 
-  async function sendNotification(pairNumber: number) {
+  async function sendNotification(pairNumber: number, until: number) {
     const today = formatDateString(DateTime().toJSDate());
 
     const lesson = await ScheduleModel.findOne({
@@ -58,7 +58,9 @@ export function startPairNotifications() {
 
     const url = await getTeamsUrl(subjectName!);
 
-    const text = `<blockquote>Внимание, пара!</blockquote>\n<b>Предмет:</b> ${subjectName}\n<b>Время:</b> ${lesson.started_at}-${lesson.finished_at}\n<b>Ссылка:</b> <i>${url ? url : "Не выложена"}</i>\n<b>Напутствие:</b>\n<blockquote>${quote}</blockquote>`;
+    const label = until == -1 ? "Пара начинается!" : `До пары осталось ${until} минут!`
+
+    const text = `<blockquote>${label}</blockquote>\n<b>Предмет:</b> ${subjectName}\n<b>Время:</b> ${lesson.started_at}-${lesson.finished_at}\n<b>Ссылка:</b> <i>${url ? url : "Не выложена"}</i>\n<b>Напутствие:</b>\n<blockquote>${quote}</blockquote>`;
 
     try {
       await tgBot.api.sendPhoto(
@@ -77,15 +79,34 @@ export function startPairNotifications() {
     }
   }
 
-  const jobs: Array<[string, number]> = [
-    ["30 8  * * *", 1],
-    ["0  10 * * *", 2],
-    ["30 11 * * *", 3],
-    ["30 13 * * *", 4],
-    ["0  15 * * *", 5],
+  const jobs: Array<[string, number, number]> = [
+    // 1 пара (8:20 – 10:00)
+    ["20 8  * * *", 1, 10],
+    ["25 8  * * *", 1, 5],
+    ["30 8  * * *", 1, -1],
+
+    // 2 пара (10:00 – 11:30)
+    ["50 9  * * *", 2, 10],
+    ["55 9  * * *", 2, 5],
+    ["0  10 * * *", 2, -1],
+
+    // 3 пара (11:30 – 13:00)
+    ["20 11 * * *", 3, 10],
+    ["25 11 * * *", 3, 5],
+    ["30 11 * * *", 3, -1],
+
+    // 4 пара (13:30 – 15:00)
+    ["20 13 * * *", 4, 10],
+    ["25 13 * * *", 4, 5],
+    ["30 13 * * *", 4, -1],
+
+    // 5 пара (15:00 – 16:30)
+    ["50 14 * * *", 5, 10],
+    ["55 14 * * *", 5, 5],
+    ["0  15 * * *", 5, -1],
   ];
 
-  for (const [rule, pair] of jobs) {
-    scheduleJob({ rule, tz: AppConfig.Tz }, () => sendNotification(pair));
+  for (const [rule, pair, until] of jobs) {
+    scheduleJob({ rule, tz: AppConfig.Tz }, () => sendNotification(pair, until));
   }
 }
