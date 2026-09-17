@@ -1,7 +1,6 @@
 import { AppConfig } from "../../config.js";
 import { ScheduleModel } from "../../db/schedule.js";
 import { formatSubjectName } from "../../tools/format-subject-name.js";
-import { formatDateString } from "../../tools/format-date-string.js";
 import { formatWeekDay } from "../../tools/format-week-day.js";
 import type { AppContext } from "../index.js";
 import { DateTime } from "../../tools/datetime-now.js";
@@ -16,7 +15,7 @@ async function execute(ctx: AppContext, shift: -1 | 0 | 1) {
     return;
   }
 
-  const thisDay = formatDateString(DateTime().plus({ day: shift }).toJSDate());
+  const thisDay = DateTime().toFormat(AppConfig.TimeFormat);
 
   const table = await ScheduleModel.find({
     date: thisDay,
@@ -33,7 +32,7 @@ async function execute(ctx: AppContext, shift: -1 | 0 | 1) {
     : "Нет пар";
 
   await ctx.reply(
-    `<blockquote>Расписание на сегодня</blockquote>\n<b>Сегодня — ${formatWeekDay(new Date())}!</b>\n\n<strong>Расписание:</strong>\n${schedule}`,
+    `<blockquote>Расписание на сегодня</blockquote>\n<b>Сегодня — ${formatWeekDay(DateTime().localWeekday)}!</b>\n\n<strong>Расписание:</strong>\n${schedule}`,
     {
       parse_mode: "HTML",
     },

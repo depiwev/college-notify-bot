@@ -1,5 +1,5 @@
 import { scheduleJob } from "node-schedule";
-import { ScheduleModel, type ScheduleDocument } from "../db/schedule.js";
+import { ScheduleModel } from "../db/schedule.js";
 import { omniaApiClient } from "../api/omnia.js";
 import { AppConfig } from "../config.js";
 
@@ -30,10 +30,6 @@ export function startTableFetch() {
     }
   }
 
-  scheduleJob(
-    "table-fetch",
-    { rule: "0 0 * * *", tz: AppConfig.Tz },
-    execute,
-  );
+  scheduleJob("table-fetch", { rule: "0 0 * * *", tz: AppConfig.Tz }, execute);
   execute();
 }

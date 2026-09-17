@@ -22,7 +22,8 @@ export const AppConfig = {
 
   NotificationChatId: getEnv("TELEGRAM_CHAT_ID"),
 
-  Tz: "Europe/Moscow"
+  Tz: "Europe/Moscow",
+  TimeFormat: "yyyy-MM-dd"
 } as const;
 
 export const TextConfig = {
@@ -117,4 +118,12 @@ export const TextConfig = {
       "Шесть-семь — это не вопрос и не ответ, это пароль для своих, который ничего не значит. И да, это тоже про пары: ты сидишь на паре, ничего не понимаешь, но киваешь, потому что все кивают.",
     ],
   },
-};
+} as const;
+
+export const PairTime = [
+  "8:30",
+  "10:00",
+  "11:30",
+  "13:30",
+  "15:00"
+] as const

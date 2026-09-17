@@ -8,6 +8,6 @@ export const weekDays = [
   "Суббота", // 6
 ] as const;
 
-export function formatWeekDay(date: Date) {
-  return weekDays[date.getDay()];
+export function formatWeekDay(day: number) {
+  return weekDays[day-1];
 }

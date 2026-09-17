@@ -63,7 +63,7 @@ export class OmniaApiClient {
     }
 
     const res = await this.fetchWithRetry(
-      `${this.baseUrl}/api/v2/schedule/operations/get-month?date_filter=${formatDateString(DateTime().toJSDate())}`,
+      `${this.baseUrl}/api/v2/schedule/operations/get-month?date_filter=${DateTime().toFormat(AppConfig.TimeFormat)}`,
       {
         headers: {
           accept: "application/json, text/plain, */*",
