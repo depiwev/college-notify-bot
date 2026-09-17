@@ -31,7 +31,7 @@ const jobs: Array<[string, number, number]> = [
 ];
 
 export function startEverydayNotification() {
-  scheduleJob("everyday-notifications", "0 8 * * *", async () => {
+  scheduleJob("everyday-notifications", {rule: "0 8 * * *", tz: AppConfig.Tz}, async () => {
     await tgBot.api.sendMessage(
       AppConfig.NotificationChatId,
       await createScheduleMessage(),
