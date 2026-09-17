@@ -3,10 +3,10 @@ import { ScheduleModel } from "../db/schedule.js";
 import { tgBot } from "../tg/index.js";
 import { AppConfig, PairTime, TextConfig } from "../config.js";
 import { DateTime } from "../tools/datetime-now.js";
-import { omniaApiClient } from "../api/omnia.js";
 import { formatSubjectName } from "../tools/format-subject-name.js";
 import { createScheduleMessage } from "../tg/commands/schedule.js";
-import { normalize } from "../tools/stem.js";
+import { omniaApiClient } from "../api/omnia.js";
+import Fuse from "fuse.js";
 
 const jobs: Array<[string, number, number]> = [
   // 1 пара (8:20 – 10:00)
@@ -49,32 +49,27 @@ export function startPairNotifications() {
     subjectName: string,
     pairNumber: number,
   ): Promise<string | null> {
-    const news = (await omniaApiClient.fetchLastNews()) ?? [];
+    const news = await omniaApiClient.fetchLastNews();
 
-    const query = normalize(subjectName);
-
-    const candidates = news.filter((n) => normalize(n.theme).includes(query));
-
-    const time = PairTime[pairNumber - 1]!;
-
-    const post =
-      candidates.find((n) => hasTime(n.theme, time)) ??
-      candidates.find((n) => normalize(n.theme).includes("пар подряд")) ??
-      candidates[0];
-
-    function hasTime(theme: string, time: string): boolean {
-      const t = normalize(theme);
-      const q = normalize(time);
-      return new RegExp(
-        `(^|\\s)${q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(\\s|$)`,
-      ).test(t);
-    }
-
-    if (!post) {
+    if (!news) {
       return null;
     }
 
-    const details = await omniaApiClient.fetchNewsDetails(post?.id_bbs);
+    const fuse = new Fuse(news ?? [], {
+      keys: ["theme"],
+      threshold: 0.4,
+      ignoreLocation: true,
+    });
+
+    const results = fuse.search(`${subjectName} ${PairTime[pairNumber - 1]}`);
+
+    if (results.length == 0) {
+      return null;
+    }
+
+    const id = results[0]?.item.id_bbs;
+
+    const details = await omniaApiClient.fetchNewsDetails(id!);
 
     if (!details) {
       return null;
@@ -85,7 +80,7 @@ export function startPairNotifications() {
         .match(/https:\/\/teams\.microsoft\.com\/[^\s<]+/)?.[0]
         ?.replace(/&amp;/g, "&") ?? null;
 
-    return url ?? null;
+    return url;
   }
 
   async function sendNotification(pairNumber: number, until: number) {
@@ -112,7 +107,7 @@ export function startPairNotifications() {
     const label =
       until == -1 ? "Пара начинается!" : `До пары осталось ${until} минут!`;
 
-    const text = `<blockquote>${label}</blockquote>\n<b>Предмет:</b> ${subjectName}\n<b>Время:</b> ${lesson.started_at}-${lesson.finished_at}\n<b>Ссылка:</b> <i>${url ? url : "Не выложена"}</i>\n<b>Напутствие:</b>\n<blockquote>${quote}</blockquote>`;
+    const text = `<blockquote>${label}</blockquote>\n<b>Предмет:</b> ${subjectName}\n<b>Время:</b> ${lesson.started_at}-${lesson.finished_at}\n<b>Ссылка:</b> <i>${url ? url.replaceAll("\"", "") : "Не выложена"}</i>\n<b>Напутствие:</b>\n<blockquote>${quote}</blockquote>`;
 
     try {
       await tgBot.api.sendPhoto(
@@ -136,4 +131,6 @@ export function startPairNotifications() {
       sendNotification(pair, until),
     );
   }
+
+  sendNotification(3, -1);
 }
