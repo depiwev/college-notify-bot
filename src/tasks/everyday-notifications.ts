@@ -6,9 +6,38 @@ import { DateTime } from "../tools/datetime-now.js";
 import { omniaApiClient } from "../api/omnia.js";
 import { formatSubjectName } from "../tools/format-subject-name.js";
 import { normalize } from "../tools/padegi-tools.js";
+import { createScheduleMessage } from "../tg/commands/schedule.js";
+
+const jobs: Array<[string, number, number]> = [
+  // 1 пара (8:20 – 10:00)
+  ["25 8  * * *", 1, 5],
+  ["30 8  * * *", 1, -1],
+
+  // 2 пара (9:00 – 11:30)
+  ["55 9  * * *", 2, 5],
+  ["0  10 * * *", 2, -1],
+
+  // 3 пара (11:20 – 13:00)
+  ["25 11 * * *", 3, 5],
+  ["30 11 * * *", 3, -1],
+
+  // 4 пара (13:20 – 15:00)
+  ["25 13 * * *", 4, 5],
+  ["30 13 * * *", 4, -1],
+
+  // 5 пара (14:50 – 16:30)
+  ["55 14 * * *", 5, 5],
+  ["0  15 * * *", 5, -1],
+];
 
 export function startEverydayNotification() {
-  scheduleJob("everyday-notifications", async () => {});
+  scheduleJob("everyday-notifications", "0 8 * * *", async () => {
+    await tgBot.api.sendMessage(
+      AppConfig.NotificationChatId,
+      await createScheduleMessage(),
+      { parse_mode: "HTML" },
+    );
+  });
 }
 
 export function startPairNotifications() {
@@ -22,7 +51,7 @@ export function startPairNotifications() {
 
     const candidates = news.filter((n) => normalize(n.theme).includes(query));
 
-    const time = PairTime[pairNumber-1]!
+    const time = PairTime[pairNumber - 1]!;
 
     const post =
       candidates.find((n) => hasTime(n.theme, time)) ??
@@ -97,28 +126,6 @@ export function startPairNotifications() {
         .catch(() => null);
     }
   }
-
-  const jobs: Array<[string, number, number]> = [
-    // 1 пара (8:20 – 10:00)
-    ["25 8  * * *", 1, 5],
-    ["30 8  * * *", 1, -1],
-
-    // 2 пара (9:00 – 11:30)
-    ["55 9  * * *", 2, 5],
-    ["0  10 * * *", 2, -1],
-
-    // 3 пара (11:20 – 13:00)
-    ["25 11 * * *", 3, 5],
-    ["30 11 * * *", 3, -1],
-
-    // 4 пара (13:20 – 15:00)
-    ["25 13 * * *", 4, 5],
-    ["30 13 * * *", 4, -1],
-
-    // 5 пара (14:50 – 16:30)
-    ["55 14 * * *", 5, 5],
-    ["0  15 * * *", 5, -1],
-  ];
 
   for (const [rule, pair, until] of jobs) {
     scheduleJob({ rule, tz: AppConfig.Tz }, () =>

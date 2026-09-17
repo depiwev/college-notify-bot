@@ -5,16 +5,7 @@ import { formatWeekDay } from "../../tools/format-week-day.js";
 import type { AppContext } from "../index.js";
 import { DateTime } from "../../tools/datetime-now.js";
 
-
-// -1 = вчера
-// 0 = сегодня
-// 1 = завтра
-// TODO: сделать штуку, которая понимает, что пары закончились
-async function execute(ctx: AppContext, shift: -1 | 0 | 1) {
-  if (ctx.chatId?.toString() != AppConfig.NotificationChatId) {
-    return;
-  }
-
+export async function createScheduleMessage() {
   const thisDay = DateTime().toFormat(AppConfig.TimeFormat);
 
   const table = await ScheduleModel.find({
@@ -31,14 +22,23 @@ async function execute(ctx: AppContext, shift: -1 | 0 | 1) {
         .join("\n\n")
     : "Нет пар";
 
-  await ctx.reply(
-    `<blockquote>Расписание на сегодня</blockquote>\n<b>Сегодня — ${formatWeekDay(DateTime().localWeekday)}!</b>\n\n<strong>Расписание:</strong>\n${schedule}`,
-    {
-      parse_mode: "HTML",
-    },
-  );
+  return `<blockquote>Расписание на сегодня</blockquote>\n<b>Сегодня — ${formatWeekDay(DateTime().localWeekday)}!</b>\n\n<strong>Расписание:</strong>\n${schedule}`;
+}
+
+// -1 = вчера
+// 0 = сегодня
+// 1 = завтра
+// TODO: сделать штуку, которая понимает, что пары закончились
+async function execute(ctx: AppContext, shift: -1 | 0 | 1) {
+  if (ctx.chatId?.toString() != AppConfig.NotificationChatId) {
+    return;
+  }
+
+  await ctx.reply(await createScheduleMessage(), {
+    parse_mode: "HTML",
+  });
 }
 
 export async function scheduleCommand(ctx: AppContext) {
-  execute(ctx, 0)
+  execute(ctx, 0);
 }
