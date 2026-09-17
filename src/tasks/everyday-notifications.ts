@@ -5,8 +5,8 @@ import { AppConfig, PairTime, TextConfig } from "../config.js";
 import { DateTime } from "../tools/datetime-now.js";
 import { omniaApiClient } from "../api/omnia.js";
 import { formatSubjectName } from "../tools/format-subject-name.js";
-import { normalize } from "../tools/padegi-tools.js";
 import { createScheduleMessage } from "../tg/commands/schedule.js";
+import { normalize } from "../tools/stem.js";
 
 const jobs: Array<[string, number, number]> = [
   // 1 пара (8:20 – 10:00)
@@ -31,13 +31,17 @@ const jobs: Array<[string, number, number]> = [
 ];
 
 export function startEverydayNotification() {
-  scheduleJob("everyday-notifications", {rule: "0 8 * * *", tz: AppConfig.Tz}, async () => {
-    await tgBot.api.sendMessage(
-      AppConfig.NotificationChatId,
-      await createScheduleMessage(),
-      { parse_mode: "HTML" },
-    );
-  });
+  scheduleJob(
+    "everyday-notifications",
+    { rule: "0 8 * * *", tz: AppConfig.Tz },
+    async () => {
+      await tgBot.api.sendMessage(
+        AppConfig.NotificationChatId,
+        await createScheduleMessage(),
+        { parse_mode: "HTML" },
+      );
+    },
+  );
 }
 
 export function startPairNotifications() {
