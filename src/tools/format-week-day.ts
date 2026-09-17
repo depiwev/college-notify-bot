@@ -9,5 +9,5 @@ export const weekDays = [
 ] as const;
 
 export function formatWeekDay(day: number) {
-  return weekDays[day-1];
+  return weekDays[day];
 }

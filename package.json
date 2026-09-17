@@ -23,7 +23,8 @@
     "luxon": "^3.7.2",
     "mongoose": "^9.10.0",
     "node-schedule": "^2.1.1",
-    "puppeteer": "^25.10.0"
+    "puppeteer": "^25.10.0",
+    "ts-cache-mongoose": "^2.2.1"
   },
   "devDependencies": {
     "@types/luxon": "^3.7.5",

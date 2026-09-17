@@ -1,9 +1,8 @@
 import { CommandGroup, type CommandsFlavor } from "@grammyjs/commands";
 import { Bot, type Context } from "grammy";
-import { scheduleCommand } from "./commands/schedule.js";
+import { scheduleCommand, scheduleMenu } from "./commands/schedule.js";
 import { AppConfig } from "../config.js";
-
-export type AppContext = CommandsFlavor<Context>;
+import type { AppContext } from "./types.js";
 
 export const tgBot = new Bot<AppContext>(AppConfig.TelegramToken);
 
@@ -12,6 +11,7 @@ export async function startBot() {
 
   commands.command("schedule", "Расписание пар", scheduleCommand);
 
+  tgBot.use(scheduleMenu);
   tgBot.use(commands);
 
   await commands.setCommands(tgBot);

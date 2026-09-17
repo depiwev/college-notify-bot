@@ -37,7 +37,7 @@ export function startEverydayNotification() {
     async () => {
       await tgBot.api.sendMessage(
         AppConfig.NotificationChatId,
-        await createScheduleMessage(),
+        await createScheduleMessage("Today"),
         { parse_mode: "HTML" },
       );
     },
@@ -132,5 +132,4 @@ export function startPairNotifications() {
     );
   }
 
-  sendNotification(3, -1);
 }
