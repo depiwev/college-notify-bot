@@ -7,6 +7,7 @@ import { formatSubjectName } from "../tools/format-subject-name.js";
 import { createScheduleMessage } from "../tg/commands/schedule.js";
 import { omniaApiClient } from "../api/omnia.js";
 import Fuse from "fuse.js";
+import { DateTime as DT } from "luxon";
 
 const jobs: Array<[string, number, number]> = [
   // 1 пара (8:20 – 10:00)
@@ -55,11 +56,18 @@ export function startPairNotifications() {
       return null;
     }
 
-    const fuse = new Fuse(news ?? [], {
-      keys: ["theme"],
-      threshold: 0.4,
-      ignoreLocation: true,
-    });
+    const fuse = new Fuse(
+      (news ?? []).map((n) => ({
+        theme: n.theme.toLowerCase(),
+        time: n.time,
+        id_bbs: n.id_bbs,
+      })),
+      {
+        keys: ["theme"],
+        threshold: 0.4,
+        ignoreLocation: true,
+      },
+    );
 
     const results = fuse.search(`${subjectName} ${PairTime[pairNumber - 1]}`);
 
@@ -67,7 +75,11 @@ export function startPairNotifications() {
       return null;
     }
 
-    const id = results[0]?.item.id_bbs;
+    const id = results
+      .filter((r) =>
+        DT.fromJSDate(new Date(r.item.time)).hasSame(DT.now(), "day"),
+      )
+      .map((r) => r.item)[0]?.id_bbs;
 
     const details = await omniaApiClient.fetchNewsDetails(id!);
 
@@ -107,7 +119,7 @@ export function startPairNotifications() {
     const label =
       until == -1 ? "Пара начинается!" : `До пары осталось ${until} минут!`;
 
-    const text = `<blockquote>${label}</blockquote>\n<b>Предмет:</b> ${subjectName}\n<b>Время:</b> ${lesson.started_at}-${lesson.finished_at}\n<b>Ссылка:</b> <i>${url ? url.replaceAll("\"", "") : "Не выложена"}</i>\n<b>Напутствие:</b>\n<blockquote>${quote}</blockquote>`;
+    const text = `<blockquote>${label}</blockquote>\n<b>Предмет:</b> ${subjectName}\n<b>Время:</b> ${lesson.started_at}-${lesson.finished_at}\n<b>Ссылка:</b> <i>${url ? url.replaceAll('"', "") : "Не выложена"}</i>\n<b>Напутствие:</b>\n<blockquote>${quote}</blockquote>`;
 
     try {
       await tgBot.api.sendPhoto(
