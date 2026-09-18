@@ -143,5 +143,4 @@ export function startPairNotifications() {
       sendNotification(pair, until),
     );
   }
-
 }
