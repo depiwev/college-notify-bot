@@ -47,7 +47,8 @@ export const TextConfig = {
       "https://i.pinimg.com/736x/e0/a8/e8/e0a8e8d5ceda913a287056c00dfa622c.jpg",
       "https://i.pinimg.com/736x/28/61/f3/2861f3eed8b2c6733219e590a5def39e.jpg",
       "https://i.pinimg.com/736x/c9/f9/7f/c9f97f70ca5e67a4148492041664fecf.jpg",
-      "https://i.pinimg.com/736x/44/87/7d/44877db6be4c0ce7065637c534503690.jpg"
+      "https://i.pinimg.com/736x/44/87/7d/44877db6be4c0ce7065637c534503690.jpg",
+      "https://avatars.mds.yandex.net/i?id=a59c04eb43e590b835649b97d3ce56f4_l-5579637-images-thumbs&n=13"
     ],
     quotes: [
       "Первая пара в колледже — это всегда лотерея: либо ты ещё спишь, либо уже опоздал.",
