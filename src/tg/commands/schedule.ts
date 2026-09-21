@@ -113,10 +113,6 @@ async function scheduleMenuCb(
 }
 
 export async function scheduleCommand(ctx: AppContext) {
-  if (ctx.chatId?.toString() != AppConfig.NotificationChatId) {
-    return;
-  }
-
   await ctx.reply(await createScheduleMessage("None"), {
     parse_mode: "HTML",
     reply_markup: scheduleMenu,

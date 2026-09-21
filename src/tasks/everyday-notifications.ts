@@ -40,7 +40,7 @@ export function startEverydayNotification() {
         AppConfig.NotificationChatId,
         await createScheduleMessage("Today"),
         { parse_mode: "HTML" },
-      );
+      ).catch(() => null);
     },
   );
 }
