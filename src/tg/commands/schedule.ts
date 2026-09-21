@@ -71,12 +71,6 @@ export async function createScheduleMessage(
       break;
   }
 
-  if (scope === "None" && (todayA.length === 0 || isLastPairEnded)) {
-    scheduleA = tommorowA;
-    scheduleLabel = "Завтра";
-    scheduleDate = tommorow;
-  }
-
   const schedule = scheduleA.length
     ? scheduleA
         .sort((a, b) => a.lesson! - b.lesson!)

@@ -11,7 +11,6 @@ function getEnv(name: string, default_?: string) {
 }
 
 export const AppConfig = {
-
   AppEnv: getEnv("APP_ENV", "prod"),
 
   OmniaPassword: getEnv("OMNIA_PASSWORD"),
@@ -26,7 +25,7 @@ export const AppConfig = {
   NotificationChatId: getEnv("TELEGRAM_CHAT_ID"),
 
   Tz: "Europe/Moscow",
-  TimeFormat: "yyyy-MM-dd"
+  TimeFormat: "yyyy-MM-dd",
 } as const;
 
 export const TextConfig = {
@@ -50,7 +49,28 @@ export const TextConfig = {
       "https://i.pinimg.com/736x/44/87/7d/44877db6be4c0ce7065637c534503690.jpg",
       "https://avatars.mds.yandex.net/i?id=a59c04eb43e590b835649b97d3ce56f4_l-5579637-images-thumbs&n=13",
       "https://www.threads.com/@yulishevskiy/post/DI091iotXZI/%D0%BE%D1%81%D0%BE%D0%B1%D0%BE-%D0%BC%D0%BE%D0%B7%D0%B3-%D0%BD%D0%B5-%D0%B5%D0%B1%D0%B8%D1%82%D0%B5-%D1%82%D0%B0%D0%BA-%D0%BF%D0%BE%D1%81%D0%BF%D1%80%D0%B0%D1%88%D0%B8%D0%B2%D0%B0%D0%B9%D1%82%D0%B5",
-      "https://www.facebook.com/lomovoyband/photos/%D0%BB%D0%BE%D0%BC%D0%BE%D0%B2%D0%BE%D0%B9-%D0%BC%D0%BE%D0%B7%D0%B3%D0%BE%D0%B5%D0%B1%D0%BB%D1%8F%D1%80%D0%B8%D1%81%D1%83%D0%B5%D1%82-%D1%8F%D0%BD%D0%B4%D0%B5%D0%BA%D1%81-%D0%B2%D0%BE%D1%81%D0%B5%D0%BC%D1%8C-%D0%B1%D0%B0%D0%BB%D0%BB%D0%BE%D0%B2%D0%B0-%D0%B7%D0%B0-%D0%BE%D0%BA%D0%BD%D0%BE%D0%BC-%D0%BE%D0%BF%D1%8F%D1%82%D1%8C-%D0%BD%D0%B8-%D0%B7%D0%B3%D0%B8%D0%B8-%D0%B2%D1%81%D0%BF%D0%BE%D0%BC%D0%BD%D0%B8%D0%BB-%D1%8F-/1352653551480658/"
+      "https://www.facebook.com/lomovoyband/photos/%D0%BB%D0%BE%D0%BC%D0%BE%D0%B2%D0%BE%D0%B9-%D0%BC%D0%BE%D0%B7%D0%B3%D0%BE%D0%B5%D0%B1%D0%BB%D1%8F%D1%80%D0%B8%D1%81%D1%83%D0%B5%D1%82-%D1%8F%D0%BD%D0%B4%D0%B5%D0%BA%D1%81-%D0%B2%D0%BE%D1%81%D0%B5%D0%BC%D1%8C-%D0%B1%D0%B0%D0%BB%D0%BB%D0%BE%D0%B2%D0%B0-%D0%B7%D0%B0-%D0%BE%D0%BA%D0%BD%D0%BE%D0%BC-%D0%BE%D0%BF%D1%8F%D1%82%D1%8C-%D0%BD%D0%B8-%D0%B7%D0%B3%D0%B8%D0%B8-%D0%B2%D1%81%D0%BF%D0%BE%D0%BC%D0%BD%D0%B8%D0%BB-%D1%8F-/1352653551480658/",
+      "https://i.pinimg.com/736x/df/fb/20/dffb204cee0a03f573183e2bd2fff4b6.jpg",
+      "https://i.pinimg.com/736x/da/0b/cc/da0bcc1a52f2817dbb13e1cb97b237b1.jpg",
+      "https://i.pinimg.com/736x/09/8d/c9/098dc907731b801028028d35357b73f5.jpg",
+      "https://i.pinimg.com/736x/26/e8/73/26e8734f32b27773254ede8ee9e7f300.jpg",
+      "https://i.pinimg.com/736x/90/33/e0/9033e07e623820249fe8fc66729aa484.jpg",
+      "https://i.pinimg.com/736x/01/0a/83/010a8383335907eed5a540d1f0bff791.jpg",
+      "https://i.pinimg.com/736x/1d/a4/4f/1da44f3aa2dc1b71b31411db6c838c7e.jpg",
+      "https://i.pinimg.com/736x/a2/d8/0c/a2d80c518d37e52f53ae2970d421f3eb.jpg",
+      "https://i.pinimg.com/736x/4e/a5/86/4ea586c631b4e98f986beeb336b42c48.jpg",
+      "https://i.pinimg.com/1200x/65/e5/6f/65e56fe4881401f912f4a3e7f543ee8d.jpg",
+      "https://i.pinimg.com/736x/d6/6f/3c/d66f3c656d061ff8b62ecba19448af8c.jpg",
+      "https://i.pinimg.com/736x/74/cc/9d/74cc9dda331bc1b9d9cc97ae30151380.jpg",
+      "https://i.pinimg.com/736x/a0/7c/87/a07c8782bad90c9510cebdefc910ffb6.jpg",
+      "https://i.pinimg.com/736x/df/fb/20/dffb204cee0a03f573183e2bd2fff4b6.jpg",
+      "https://i.pinimg.com/736x/62/c6/63/62c663901743282c04f91712d4735b65.jpg",
+      "https://i.pinimg.com/736x/67/1f/da/671fdab4becac5dd069c1ee712c32ad9.jpg",
+      "https://i.pinimg.com/736x/80/21/f9/8021f90c308123aed7d103837f052c97.jpg",
+      "https://i.pinimg.com/736x/ef/e3/01/efe30177e2f4f753a36ed4a70eb62a6c.jpg",
+      "https://i.pinimg.com/736x/e6/8a/c6/e68ac642af84737473645fceea2d54d4.jpg",
+      "https://i.pinimg.com/736x/d0/46/7b/d0467ba9861a4b88492bf0d8ef123444.jpg",
+      "https://i.pinimg.com/736x/92/ea/36/92ea363308016d006df9bcdd34636bfb.jpg"
     ],
     quotes: [
       "Первая пара в колледже — это всегда лотерея: либо ты ещё спишь, либо уже опоздал.",
@@ -125,10 +145,4 @@ export const TextConfig = {
   },
 } as const;
 
-export const PairTime = [
-  "8:30",
-  "10:00",
-  "11:30",
-  "13:30",
-  "15:00"
-] as const
+export const PairTime = ["8:30", "10:00", "11:30", "13:30", "15:00"] as const;
