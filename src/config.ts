@@ -48,7 +48,9 @@ export const TextConfig = {
       "https://i.pinimg.com/736x/28/61/f3/2861f3eed8b2c6733219e590a5def39e.jpg",
       "https://i.pinimg.com/736x/c9/f9/7f/c9f97f70ca5e67a4148492041664fecf.jpg",
       "https://i.pinimg.com/736x/44/87/7d/44877db6be4c0ce7065637c534503690.jpg",
-      "https://avatars.mds.yandex.net/i?id=a59c04eb43e590b835649b97d3ce56f4_l-5579637-images-thumbs&n=13"
+      "https://avatars.mds.yandex.net/i?id=a59c04eb43e590b835649b97d3ce56f4_l-5579637-images-thumbs&n=13",
+      "https://www.threads.com/@yulishevskiy/post/DI091iotXZI/%D0%BE%D1%81%D0%BE%D0%B1%D0%BE-%D0%BC%D0%BE%D0%B7%D0%B3-%D0%BD%D0%B5-%D0%B5%D0%B1%D0%B8%D1%82%D0%B5-%D1%82%D0%B0%D0%BA-%D0%BF%D0%BE%D1%81%D0%BF%D1%80%D0%B0%D1%88%D0%B8%D0%B2%D0%B0%D0%B9%D1%82%D0%B5",
+      "https://www.facebook.com/lomovoyband/photos/%D0%BB%D0%BE%D0%BC%D0%BE%D0%B2%D0%BE%D0%B9-%D0%BC%D0%BE%D0%B7%D0%B3%D0%BE%D0%B5%D0%B1%D0%BB%D1%8F%D1%80%D0%B8%D1%81%D1%83%D0%B5%D1%82-%D1%8F%D0%BD%D0%B4%D0%B5%D0%BA%D1%81-%D0%B2%D0%BE%D1%81%D0%B5%D0%BC%D1%8C-%D0%B1%D0%B0%D0%BB%D0%BB%D0%BE%D0%B2%D0%B0-%D0%B7%D0%B0-%D0%BE%D0%BA%D0%BD%D0%BE%D0%BC-%D0%BE%D0%BF%D1%8F%D1%82%D1%8C-%D0%BD%D0%B8-%D0%B7%D0%B3%D0%B8%D0%B8-%D0%B2%D1%81%D0%BF%D0%BE%D0%BC%D0%BD%D0%B8%D0%BB-%D1%8F-/1352653551480658/"
     ],
     quotes: [
       "Первая пара в колледже — это всегда лотерея: либо ты ещё спишь, либо уже опоздал.",
