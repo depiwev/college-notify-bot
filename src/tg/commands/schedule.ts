@@ -27,26 +27,11 @@ export async function createScheduleMessage(
     .sort({ lesson: -1 })
     .cache("600 seconds");
 
-  const now = DateTime();
-
   const [yesterdayA, todayA, tommorowA] = [
     table.filter((t) => t.date === yesterday.toFormat(AppConfig.TimeFormat)),
     table.filter((t) => t.date === today.toFormat(AppConfig.TimeFormat)),
     table.filter((t) => t.date === tommorow.toFormat(AppConfig.TimeFormat)),
   ];
-
-  const lastToday = todayA[todayA.length - 1];
-  const isLastPairEnded = lastToday
-    ? (() => {
-        const [lastHour, lastMinute] = lastToday
-          .finished_at!.split(":")
-          .map(Number);
-        return (
-          now.hour > lastHour! ||
-          (now.hour === lastHour && now.minute > lastMinute!)
-        );
-      })()
-    : true;
 
   let scheduleA = todayA;
   let scheduleLabel = "Сегодня";

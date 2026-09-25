@@ -9,6 +9,9 @@ import { startBot } from "./tg/index.js";
 import { startPairNotifications } from "./tasks/everyday-notifications.js";
 
 import { config } from "dotenv";
+import dns from "node:dns/promises";
+
+dns.setServers(["1.1.1.1"]);
 
 config();
 

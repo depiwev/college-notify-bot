@@ -36,11 +36,13 @@ export function startEverydayNotification() {
     "everyday-notifications",
     { rule: "0 8 * * *", tz: AppConfig.Tz },
     async () => {
-      await tgBot.api.sendMessage(
-        AppConfig.NotificationChatId,
-        await createScheduleMessage("Today"),
-        { parse_mode: "HTML" },
-      ).catch(() => null);
+      await tgBot.api
+        .sendMessage(
+          AppConfig.NotificationChatId,
+          await createScheduleMessage("Today"),
+          { parse_mode: "HTML" },
+        )
+        .catch(() => null);
     },
   );
 }
@@ -115,6 +117,10 @@ export function startPairNotifications() {
     const subjectName = formatSubjectName(lesson.subject_name!);
 
     const url = await getTeamsUrl(subjectName!, pairNumber);
+
+    if (url) {
+      await ScheduleModel.updateOne({ _id: lesson._id }, { teams_url: url });
+    }
 
     const label =
       until == -1 ? "Пара начинается!" : `До пары осталось ${until} минут!`;

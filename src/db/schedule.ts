@@ -6,6 +6,7 @@ const ScheduleSchema = new mongoose.Schema({
   started_at: { type: String },
   finished_at: { type: String },
   subject_name: { type: String },
+  teams_url: { type: String, default: () => null },
   teacher_name: { type: String },
   created_at: { type: Date, default: () => new Date() },
 });
