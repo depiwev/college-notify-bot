@@ -1,6 +1,5 @@
 import { AppConfig } from "../config.js";
 import { DateTime } from "../tools/datetime-now.js";
-import { formatDateString } from "../tools/format-date-string.js";
 
 type LoginResponse = {
   access_token: string;
@@ -84,7 +83,7 @@ export class OmniaApiClient {
       },
     );
 
-    data = await res.json();
+    data = await res?.json().catch(() => null);
 
     return data;
   }
@@ -118,7 +117,7 @@ export class OmniaApiClient {
       credentials: "include",
     });
 
-    let data: LoginResponse | null = await res.json().catch(() => null);
+    let data: LoginResponse | null = await res?.json().catch(() => null);
 
     return data;
   }
@@ -152,7 +151,7 @@ export class OmniaApiClient {
       },
     );
 
-    data = await res.json().catch(() => null);
+    data = await res?.json().catch(() => null);
 
     return data;
   }
@@ -186,7 +185,7 @@ export class OmniaApiClient {
       },
     );
 
-    data = await res.json().catch(() => null);
+    data = await res?.json().catch(() => null);
 
     return data;
   }
@@ -196,7 +195,7 @@ export class OmniaApiClient {
     init: RequestInit = {},
     retries = 3,
     delay = 500,
-  ): Promise<Response> {
+  ): Promise<Response | null> {
     let lastErr: unknown;
 
     for (let i = 0; i < retries; i++) {
@@ -213,7 +212,7 @@ export class OmniaApiClient {
       }
     }
 
-    throw lastErr;
+    return null;
   }
 
   private async checkLogin() {
