@@ -37,15 +37,13 @@ export function startPairNotifications() {
   ): Promise<string | null> {
     const news = await omniaApiClient.fetchLastNews();
 
-    if (!news || news.length === 0) {
-      return null;
-    }
+    if (!news?.length) return null;
 
     const fuse = new Fuse(
-      news.map((n) => ({
-        theme: n.theme.toLowerCase(),
-        time: n.time,
-        id_bbs: n.id_bbs,
+      news.map((item) => ({
+        theme: item.theme.toLowerCase(),
+        time: item.time,
+        id_bbs: item.id_bbs,
       })),
       {
         keys: ["theme"],
@@ -54,80 +52,109 @@ export function startPairNotifications() {
       },
     );
 
-    const results = fuse.search(`${subjectName} ${PairTime[pairNumber - 1]}`);
-
-    if (results.length === 0) {
-      return null;
-    }
+    const results = fuse.search(
+      `${subjectName} ${PairTime[pairNumber - 1]}`,
+    );
 
     const id = results
-      .filter((r) =>
-        DT.fromJSDate(new Date(r.item.time)).hasSame(DT.now(), "day"),
+      .filter((result) =>
+        DT.fromJSDate(new Date(result.item.time)).hasSame(DT.now(), "day"),
       )
-      .map((r) => r.item)[0]?.id_bbs;
+      .map((result) => result.item)[0]?.id_bbs;
 
-    if (!id) {
-      return null;
-    }
+    if (!id) return null;
 
     const details = await omniaApiClient.fetchNewsDetails(id);
 
-    if (!details) {
-      return null;
-    }
+    if (!details) return null;
 
-    const url =
+    return (
       details.text_bbs
         .match(/https:\/\/teams\.microsoft\.com\/[^\s<]+/)?.[0]
-        ?.replace(/&amp;/g, "&") ?? null;
-
-    return url;
+        ?.replace(/&amp;/g, "&") ?? null
+    );
   }
 
   async function sendNotification(pairNumber: number, until: number) {
     const today = DateTime().toFormat(AppConfig.TimeFormat);
-
     const lesson = await ScheduleModel.findOne({
       lesson: pairNumber,
       date: today,
     });
 
-    if (!lesson) {
-      return;
-    }
+    if (!lesson) return;
 
-    const quote =
-      TextConfig.memes.quotes[
-        Math.round(Math.random() * TextConfig.memes.quotes.length)
-      ];
-
+    const quotes = TextConfig.memes.quotes;
+    const quote = quotes[Math.floor(Math.random() * quotes.length)];
     const subjectName = formatSubjectName(lesson.subject_name!);
 
-    const url = await getTeamsUrl(subjectName!, pairNumber);
+    let url: string | null = null;
+    try {
+      url = await getTeamsUrl(subjectName!, pairNumber);
+    } catch (error) {
+      console.error("[PairNotifications] Не удалось получить ссылку Teams", {
+        pairNumber,
+        subjectName,
+        error,
+      });
+    }
 
     if (url) {
-      await ScheduleModel.updateOne({ _id: lesson._id }, { teams_url: url });
+      try {
+        await ScheduleModel.updateOne(
+          { _id: lesson._id },
+          { teams_url: url },
+        );
+      } catch (error) {
+        console.error("[PairNotifications] Не удалось сохранить ссылку Teams", {
+          pairNumber,
+          error,
+        });
+      }
     }
 
     const label =
-      until == -1 ? "Пара начинается!" : `До пары осталось ${until} минут!`;
+      until === -1 ? "Пара начинается!" : `До пары осталось ${until} минут!`;
+    const displayedUrl = url
+      ? url.replaceAll('"', "").replace(/&/g, "&amp;")
+      : "Не выложена";
 
-    const text = `<blockquote>${label}</blockquote>\n<b>Предмет:</b> ${subjectName}\n<b>Время:</b> ${lesson.started_at}-${lesson.finished_at}\n<b>Ссылка:</b> <i>${url ? url.replaceAll('"', "") : "Не выложена"}</i>\n<b>Напутствие:</b>\n<blockquote>${quote}</blockquote>`;
+    const text =
+      `<blockquote>${label}</blockquote>\n` +
+      `<b>Предмет:</b> ${subjectName}\n` +
+      `<b>Время:</b> ${lesson.started_at}-${lesson.finished_at}\n` +
+      `<b>Ссылка:</b> <i>${displayedUrl}</i>\n` +
+      `<b>Напутствие:</b>\n<blockquote>${quote}</blockquote>`;
+
+    const pairImages = TextConfig.memes.pairs;
+    const image = pairImages[Math.floor(Math.random() * pairImages.length)] as
+      | string
+      | undefined;
 
     try {
-      await tgBot.api.sendPhoto(
-        AppConfig.NotificationChatId,
-        TextConfig.memes.pairs[
-          Math.round(Math.random() * TextConfig.memes.pairs.length)
-        ] as string,
-        { caption: text, parse_mode: "HTML" },
+      if (!image) throw new Error("Изображение для уведомления не задано");
+
+      await tgBot.api.sendPhoto(AppConfig.NotificationChatId, image, {
+        caption: text,
+        parse_mode: "HTML",
+      });
+    } catch (error) {
+      console.error(
+        "[PairNotifications] Не удалось отправить фото, отправляем текст",
+        error,
       );
-    } catch {
+
       await tgBot.api
         .sendMessage(AppConfig.NotificationChatId, text, {
           parse_mode: "HTML",
         })
-        .catch(() => null);
+        .catch((sendError) => {
+          console.error(
+            "[PairNotifications] Не удалось отправить уведомление",
+            sendError,
+          );
+          return null;
+        });
     }
   }
 

@@ -66,7 +66,13 @@ export async function createScheduleMessage(
         .join("\n\n")
     : "Нет пар";
 
-  return `<blockquote>Расписание на ${scheduleLabel.toLowerCase()}</blockquote>\n<b>День недели — ${formatWeekDay(scheduleDate.weekday)}!</b>\n\n<strong>Предметы:</strong>\n${schedule}`;
+  return [
+    `<blockquote>Расписание на ${scheduleLabel.toLowerCase()}</blockquote>`,
+    `<b>День недели — ${formatWeekDay(scheduleDate.weekday)}!</b>`,
+    "",
+    "<strong>Предметы:</strong>",
+    schedule,
+  ].join("\n");
 }
 
 export const scheduleMenuId = "schedule-menu";
