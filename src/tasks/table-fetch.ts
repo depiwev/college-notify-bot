@@ -20,11 +20,9 @@ export function startTableFetch() {
         return;
       }
 
-      if (tables.length > 0) {
-        await ScheduleModel.insertMany(
-          tables.map((t) => ({ ...t, created_at: new Date(t.date) })),
-        );
-      }
+      await ScheduleModel.insertMany(
+        tables.map((t) => ({ ...t, created_at: new Date(t.date) })),
+      );
 
       console.log("Расписание успешно актуализировано");
     }

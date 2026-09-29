@@ -38,8 +38,8 @@ type Lesson = {
 type News = {
   id_bbs: number;
   theme: string;
-  time: string; // date string
-  viewed: boolean; // my own field :)
+  time: string;
+  viewed: boolean;
 };
 
 type NewsDetails = {
@@ -54,14 +54,10 @@ export class OmniaApiClient {
   private accessToken: string | null = null;
   private accessTokenExpires: number | null = null;
 
-  async fetchTable() {
-    let data: Lesson[] | null = null;
+  async fetchTable(): Promise<Lesson[] | null> {
+    if (!(await this.checkLogin())) return null;
 
-    if (!(await this.checkLogin())) {
-      return data;
-    }
-
-    const res = await this.fetchWithRetry(
+    return this.fetchWithRetry<Lesson[]>(
       `${this.baseUrl}/api/v2/schedule/operations/get-month?date_filter=${DateTime().toFormat(AppConfig.TimeFormat)}`,
       {
         headers: {
@@ -82,55 +78,46 @@ export class OmniaApiClient {
         method: "GET",
       },
     );
-
-    data = await res?.json().catch(() => null);
-
-    return data;
   }
 
-  async fetchToken(): Promise<null | LoginResponse> {
+  async fetchToken(): Promise<LoginResponse | null> {
     const payload = {
       application_key: AppConfig.OmniaAppKey,
       username: AppConfig.OmniaUsername,
       password: AppConfig.OmniaPassword,
     } satisfies LoginPayload;
 
-    const res = await this.fetchWithRetry(`${this.baseUrl}/api/v2/auth/login`, {
-      headers: {
-        accept: "application/json, text/plain, */*",
-        "accept-language": "ru_RU, ru",
-        authorization: "Bearer null",
-        "content-type": "application/json",
-        priority: "u=1, i",
-        "sec-ch-ua":
-          '"Chromium";v="152", "Not?A_Brand";v="24", "Google Chrome";v="152"',
-        "sec-ch-ua-mobile": "?1",
-        "sec-ch-ua-platform": '"Android"',
-        "sec-fetch-dest": "empty",
-        "sec-fetch-mode": "cors",
-        "sec-fetch-site": "same-site",
+    return this.fetchWithRetry<LoginResponse>(
+      `${this.baseUrl}/api/v2/auth/login`,
+      {
+        headers: {
+          accept: "application/json, text/plain, */*",
+          "accept-language": "ru_RU, ru",
+          authorization: "Bearer null",
+          "content-type": "application/json",
+          priority: "u=1, i",
+          "sec-ch-ua":
+            '"Chromium";v="152", "Not?A_Brand";v="24", "Google Chrome";v="152"',
+          "sec-ch-ua-mobile": "?1",
+          "sec-ch-ua-platform": '"Android"',
+          "sec-fetch-dest": "empty",
+          "sec-fetch-mode": "cors",
+          "sec-fetch-site": "same-site",
+        },
+        referrer: "https://journal.top-academy.ru/",
+        body: JSON.stringify(payload),
+        method: "POST",
+        mode: "cors",
+        credentials: "include",
       },
-      referrer: "https://journal.top-academy.ru/",
-      body: JSON.stringify(payload),
-      method: "POST",
-      mode: "cors",
-      credentials: "include",
-    });
-
-    let data: LoginResponse | null = await res?.json().catch(() => null);
-
-    return data;
+    );
   }
 
-  async fetchLastNews() {
-    let data: News[] | null = null;
+  async fetchLastNews(): Promise<News[] | null> {
+    if (!(await this.checkLogin())) return null;
 
-    if (!(await this.checkLogin())) {
-      return data;
-    }
-
-    const res = await this.fetchWithRetry(
-      "https://msapi.top-academy.ru/api/v2/news/operations/latest-news",
+    return this.fetchWithRetry<News[]>(
+      `${this.baseUrl}/api/v2/news/operations/latest-news`,
       {
         headers: {
           accept: "application/json, text/plain, */*",
@@ -150,20 +137,12 @@ export class OmniaApiClient {
         method: "GET",
       },
     );
-
-    data = await res?.json().catch(() => null);
-
-    return data;
   }
 
-  async fetchNewsDetails(id: number) {
-    let data: NewsDetails | null = null;
+  async fetchNewsDetails(id: number): Promise<NewsDetails | null> {
+    if (!(await this.checkLogin())) return null;
 
-    if (!(await this.checkLogin())) {
-      return data;
-    }
-
-    const res = await this.fetchWithRetry(
+    return this.fetchWithRetry<NewsDetails>(
       `${this.baseUrl}/api/v2/news/operations/detail-news?news_id=${id}`,
       {
         headers: {
@@ -184,51 +163,44 @@ export class OmniaApiClient {
         method: "GET",
       },
     );
-
-    data = await res?.json().catch(() => null);
-
-    return data;
   }
 
-  private async fetchWithRetry(
+  private async fetchWithRetry<T>(
     url: string,
-    init: RequestInit = {},
-    retries = 3,
-    delay = 500,
-  ): Promise<Response | null> {
-    let lastErr: unknown;
+    options: RequestInit,
+    tries = 3,
+  ): Promise<T | null> {
+    let attempt = 0;
 
-    for (let i = 0; i < retries; i++) {
+    while (attempt < tries) {
       try {
-        const res = await fetch(url, init);
-        if (res.ok) return res;
-        lastErr = new Error(`HTTP ${res.status}`);
-      } catch (err) {
-        lastErr = err;
+        const res = await fetch(url, options);
+
+        if (res.status >= 200 && res.status < 300) {
+          return (await res.json().catch(() => null)) as T | null;
+        }
+      } catch(err) {
+        console.log(`Произошла ошибка: ${err}`)
       }
 
-      if (i < retries - 1) {
-        await new Promise((r) => setTimeout(r, delay * (i + 1)));
-      }
+      attempt++;
     }
 
     return null;
   }
 
-  private async checkLogin() {
+  private async checkLogin(): Promise<boolean> {
     if (
       !this.accessToken ||
-      (this.accessTokenExpires && Date.now() > this.accessTokenExpires)
+      (this.accessTokenExpires !== null && Date.now() >= this.accessTokenExpires)
     ) {
       const login = await this.fetchToken();
+      if (!login) return false;
 
-      if (!login) {
-        return false;
-      }
-
-      this.accessToken = login?.access_token;
-      this.accessTokenExpires = login?.expires_in_access;
+      this.accessToken = login.access_token;
+      this.accessTokenExpires = Date.now() + login.expires_in_access * 1000;
     }
+
     return true;
   }
 }

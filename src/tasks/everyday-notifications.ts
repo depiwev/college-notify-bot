@@ -4,7 +4,6 @@ import { tgBot } from "../tg/index.js";
 import { AppConfig, PairTime, TextConfig } from "../config.js";
 import { DateTime } from "../tools/datetime-now.js";
 import { formatSubjectName } from "../tools/format-subject-name.js";
-import { createScheduleMessage } from "../tg/commands/schedule.js";
 import { omniaApiClient } from "../api/omnia.js";
 import Fuse from "fuse.js";
 import { DateTime as DT } from "luxon";
@@ -31,22 +30,6 @@ const jobs: Array<[string, number, number]> = [
   ["0  15 * * *", 5, -1],
 ];
 
-export function startEverydayNotification() {
-  scheduleJob(
-    "everyday-notifications",
-    { rule: "0 8 * * *", tz: AppConfig.Tz },
-    async () => {
-      await tgBot.api
-        .sendMessage(
-          AppConfig.NotificationChatId,
-          await createScheduleMessage("Today"),
-          { parse_mode: "HTML" },
-        )
-        .catch(() => null);
-    },
-  );
-}
-
 export function startPairNotifications() {
   async function getTeamsUrl(
     subjectName: string,
@@ -54,12 +37,12 @@ export function startPairNotifications() {
   ): Promise<string | null> {
     const news = await omniaApiClient.fetchLastNews();
 
-    if (!news) {
+    if (!news || news.length === 0) {
       return null;
     }
 
     const fuse = new Fuse(
-      (news ?? []).map((n) => ({
+      news.map((n) => ({
         theme: n.theme.toLowerCase(),
         time: n.time,
         id_bbs: n.id_bbs,
@@ -73,7 +56,7 @@ export function startPairNotifications() {
 
     const results = fuse.search(`${subjectName} ${PairTime[pairNumber - 1]}`);
 
-    if (results.length == 0) {
+    if (results.length === 0) {
       return null;
     }
 
@@ -83,7 +66,11 @@ export function startPairNotifications() {
       )
       .map((r) => r.item)[0]?.id_bbs;
 
-    const details = await omniaApiClient.fetchNewsDetails(id!);
+    if (!id) {
+      return null;
+    }
+
+    const details = await omniaApiClient.fetchNewsDetails(id);
 
     if (!details) {
       return null;
