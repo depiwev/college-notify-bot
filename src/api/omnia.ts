@@ -55,14 +55,14 @@ export class OmniaApiClient {
   private accessTokenExpiresAt: number | null = null;
   private loginPromise: Promise<boolean> | null = null;
 
-  async fetchTable(): Promise<Lesson[] | null> {
+  async fetchTable(date?: string): Promise<Lesson[] | null> {
     if (!(await this.checkLogin())) return null;
 
     const params = new URLSearchParams({
-      date_filter: DateTime().toFormat(AppConfig.TimeFormat),
+      date_filter: date ?? DateTime().toFormat(AppConfig.TimeFormat),
     });
 
-    return this.fetchWithRetry<Lesson[]>(
+    return await this.fetchWithRetry<Lesson[]>(
       `${this.baseUrl}/api/v2/schedule/operations/get-month?${params}`,
       this.authenticatedRequestOptions(),
     );
@@ -75,7 +75,7 @@ export class OmniaApiClient {
       password: AppConfig.OmniaPassword,
     } satisfies LoginPayload;
 
-    return this.fetchWithRetry<LoginResponse>(
+    return await this.fetchWithRetry<LoginResponse>(
       `${this.baseUrl}/api/v2/auth/login`,
       {
         headers: this.defaultHeaders({
@@ -94,7 +94,7 @@ export class OmniaApiClient {
   async fetchLastNews(): Promise<News[] | null> {
     if (!(await this.checkLogin())) return null;
 
-    return this.fetchWithRetry<News[]>(
+    return await this.fetchWithRetry<News[]>(
       `${this.baseUrl}/api/v2/news/operations/latest-news`,
       this.authenticatedRequestOptions(),
     );

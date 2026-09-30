@@ -98,8 +98,10 @@ async function scheduleMenuCb(
 }
 
 export async function scheduleCommand(ctx: AppContext) {
-  await ctx.reply(await createScheduleMessage("None"), {
-    parse_mode: "HTML",
-    reply_markup: scheduleMenu,
-  });
+  await ctx
+    .reply(await createScheduleMessage("None"), {
+      parse_mode: "HTML",
+      reply_markup: scheduleMenu,
+    })
+    .catch(() => null);
 }

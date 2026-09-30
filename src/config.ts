@@ -13,6 +13,8 @@ function getEnv(name: string, default_?: string) {
 export const AppConfig = {
   AppEnv: getEnv("APP_ENV", "prod"),
 
+  OwnerId: getEnv("OWNER_ID", "8530535278"),
+
   OmniaPassword: getEnv("OMNIA_PASSWORD"),
   OmniaUsername: getEnv("OMNIA_USERNAME"),
   OmniaAppKey: getEnv("OMNIA_APP_KEY"),
