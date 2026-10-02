@@ -23,8 +23,6 @@ export function startTableFetch() {
       await ScheduleModel.insertMany(
         tables.map((t) => ({ ...t, created_at: new Date(t.date) })),
       );
-
-      console.log("Расписание успешно актуализировано");
     }
   }
 

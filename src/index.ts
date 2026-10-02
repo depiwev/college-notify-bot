@@ -6,7 +6,6 @@ import cache from "ts-cache-mongoose";
 import { AppConfig } from "./config.js";
 import { startTableFetch } from "./tasks/table-fetch.js";
 import { startBot } from "./tg/index.js";
-import { startPairNotifications } from "./tasks/everyday-notifications.js";
 
 import { config } from "dotenv";
 import dns from "node:dns/promises";
@@ -29,7 +28,6 @@ async function main() {
     .then(() => console.log("MongoDb подключился"));
 
   startTableFetch();
-  startPairNotifications();
 
   await startBot();
 }
